@@ -2,6 +2,11 @@ var canvasWidth = 600;//window.innerWidth;
 var canvasHeight = 500;//window.innerHeight;
 var direction = '';
 
+var centerMap = {
+    X: canvasWidth / 2 - 48 / 2,
+    Y: canvasHeight / 2 - 49 / 2
+}
+
 var stage = new Konva.Stage({
     container: 'container',
     width: canvasWidth,
@@ -158,7 +163,7 @@ function handleInput() {
 }
 
 function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+    return Math.floor(Math.random() * Math.floor(max)) + 1;
 }
 
 var waitMove = 0;
@@ -166,30 +171,56 @@ var waitMoveDirection;
 
 // бесконечный цикл игры
 var gameLoop = new Konva.Animation(function (frame) {
-    handleInput();
-    if (!wait) {
-        if (waitMove === 0) {
-            waitMove = getRandomInt(30) + 30;
-            waitMoveDirection = getRandomInt(4);
-        }
+        handleInput();
+        if (!wait) {
+            if (waitMoveDirection !== -1) {
+                if (waitMove === 0) {
+                    waitMove = getRandomInt(30) + 30;
+                    waitMoveDirection = getRandomInt(8);
+                    // 1 2 3
+                    // 4   5
+                    // 6 7 8
+                }
 
-        switch (waitMoveDirection) {
-            case 0:
-                moveUp();
-                break;
-            case 1:
-                moveDown();
-                break;
-            case 2:
-                moveLeft();
-                break;
-            case 3:
-                moveRight();
-                break;
+                if (waitMoveDirection >= 1 && waitMoveDirection <= 3)
+                    moveUp();
+                if (waitMoveDirection >= 6 && waitMoveDirection <= 8)
+                    moveDown();
+                if (waitMoveDirection === 1 || waitMoveDirection === 4 || waitMoveDirection === 6)
+                    moveLeft();
+                if (waitMoveDirection === 3 || waitMoveDirection === 5 || waitMoveDirection === 8)
+                    moveRight();
+
+                waitMove--;
+
+                if ((player.attrs.y - 1 <= 0) || (player.attrs.y + 1 >= canvasHeight - 48) ||
+                    (player.attrs.x - 1 <= 0) || (player.attrs.x + 1 >= canvasWidth - 48)) {
+                    waitMoveDirection = -1;
+                }
+            } else {
+                if (player.attrs.x > centerMap.X) {
+                    moveLeft();
+                } else if (player.attrs.x < centerMap.X) {
+                    moveRight();
+                }
+
+                if (player.attrs.y > centerMap.Y) {
+                    moveUp();
+                } else if (player.attrs.y < centerMap.Y) {
+                    moveDown();
+                }
+
+                if ((Math.abs(player.attrs.y - centerMap.Y) < 1) &&
+                    (Math.abs(player.attrs.x - centerMap.X) < 1)) {
+                    waitMoveDirection = 0;
+                    waitMove = 0;
+                }
+            }
         }
-        waitMove--;
-    }
-}, layer);
+    },
+    layer
+    )
+;
 gameLoop.start();
 
 
