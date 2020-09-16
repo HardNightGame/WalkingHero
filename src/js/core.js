@@ -2,6 +2,13 @@ var canvasWidth = 600;//window.innerWidth;
 var canvasHeight = 500;//window.innerHeight;
 var direction = '';
 
+var CenterMap = {
+    X: 600/2 - 48/2,
+    Y: 500/2 - 49/2
+} 
+
+
+
 var stage = new Konva.Stage({
     container: 'container',
     width: canvasWidth,
@@ -83,7 +90,7 @@ var player = new Konva.Sprite({
     image: playerImg,
     animation: 'idleRight',
     animations: animationsPlayer, // изображение со всеми анимациями
-    frameRate: 5, // скорость смены кадров
+    frameRate: 7, // скорость смены кадров
     frameIndex: 0 // начальный кадр
 });
 
@@ -139,21 +146,25 @@ function handleInput() {
     if (input.isDown('DOWN') || input.isDown('s')) {
         moveDown();
         setWait();
+        
     }
 
     if (input.isDown('UP') || input.isDown('w')) {
         moveUp()
         setWait();
+        
     }
 
     if (input.isDown('LEFT') || input.isDown('a')) {
         moveLeft();
         setWait();
+     
     }
 
     if (input.isDown('RIGHT') || input.isDown('d')) {
         moveRight();
         setWait();
+        
     }
 }
 
@@ -163,15 +174,31 @@ function getRandomInt(max) {
 
 var waitMove = 0;
 var waitMoveDirection;
-
+   
 // бесконечный цикл игры
 var gameLoop = new Konva.Animation(function (frame) {
     handleInput();
     if (!wait) {
-        if (waitMove === 0) {
+
+    if (player.attrs.x > CenterMap.X){
+            moveLeft();
+        } else if (player.attrs.x < CenterMap.X){
+            moveRight();}
+
+    if (!wait) { 
+
+    if (player.attrs.y > CenterMap.Y){
+            moveUp();
+        } else if (player.attrs.y < CenterMap.Y){
+            moveDown(); 
+          
+        }
+    }
+        /* if (waitMove === 0) {
             waitMove = getRandomInt(30) + 30;
             waitMoveDirection = getRandomInt(4);
         }
+    if ((player.attrs.y - 1 > 0) || (player.attrs.y + 1 < canvasHeight - 48) || (player.attrs.x - 1 > 0) || (player.attrs.x + 1 < canvasWidth - 48)) 
 
         switch (waitMoveDirection) {
             case 0:
@@ -187,7 +214,7 @@ var gameLoop = new Konva.Animation(function (frame) {
                 moveRight();
                 break;
         }
-        waitMove--;
+        waitMove--; */
     }
 }, layer);
 gameLoop.start();
